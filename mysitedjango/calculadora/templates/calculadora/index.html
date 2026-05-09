@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Teoremas | Taylor</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .math-card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-section {
+            background: #007bff;
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero-section text-center">
+        <h1>Proyecto de Métodos Numéricos</h1>
+        <p>Estudio detallado de la Serie de Taylor y Maclaurin</p>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card math-card p-4 mb-4">
+                    <h4 class="mb-3">Ingresar Función</h4>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Función f(x)</label>
+                            <input type="text" name="funcion" class="form-control" placeholder="sin(x) + x^2" required>
+                            <small class="text-muted">Usa ^ para potencias</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Punto de evaluación (a)</label>
+                            <input type="number" name="punto_a" class="form-control" value="0">
+                            <small class="text-muted">Si es 0, se aplica Maclaurin</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Calcular Paso a Paso</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                {% if resultado %}
+                {% if resultado.error %}
+                <div class="alert alert-danger">Error: {{ resultado.error }}</div>
+                {% else %}
+                <div class="card math-card p-4 mb-4" style="border-left: 5px solid #007bff;">
+                    <h4 class="text-primary">Serie de Taylor/ Serie de Maclaurin.</h4>
+                    <p>
+                        La Serie de Taylor es una aproximación de funciones mediante una suma de polinomios.
+                        Se basa en las derivadas de la función evaluadas en un punto específico a.
+                        Cuando el punto es a = 0, la serie se conoce específicamente como Serie de Maclaurin.
+                    </p>
+
+                    <div class="bg-light p-3 text-center border rounded my-3">
+                        \[ P(x) = {{ resultado.resultado_final|safe }} \]
+                    </div>
+
+                    <h5 class="mt-4">Procedimiento Detallado:</h5>
+                    <div class="accordion" id="accordionPasos">
+                        {% for paso in resultado.pasos %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#paso{{ paso.n }}">
+                                    Término n = {{ paso.n }}
+                                </button>
+                            </h2>
+                            <div id="paso{{ paso.n }}" class="accordion-collapse collapse"
+                                data-bs-parent="#accordionPasos">
+                                <div class="accordion-body">
+                                    <p><strong>1. Derivada de orden {{ paso.n }}:</strong><br>
+                                        f({{ paso.n }})(x) = {{ paso.derivada }}</p>
+
+                                    <p><strong>2. Evaluando en x = {{ punto_a|default:0 }}:</strong><br>
+                                        f({{ paso.n }})(a) = {{ paso.valor_derivada }} </p>
+
+                                    <p><strong>3. Término generado:</strong><br>
+                                        \[ {{ paso.termino_latex }} \]</p>
+
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% if resultado.grafica %}
+                        <div class="card math-card p-4 mt-4">
+                            <h4 class="text-center mb-3">Gráfico de Aproximación</h4>
+                            <div style="width: 100%; overflow: hidden; border-radius: 10px;">
+                                {{ resultado.grafica|safe }}
+                            </div>
+                            <p class="small text-muted mt-2 text-center">
+                                La línea punteada muestra cómo la serie de Taylor se ajusta a la función original.
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="text-center text-muted mt-5">
+                    <p>Ingresa una función a la izquierda para ver el desarrollo.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+
+</html>
