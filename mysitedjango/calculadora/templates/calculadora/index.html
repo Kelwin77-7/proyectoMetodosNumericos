@@ -32,7 +32,7 @@
 
     <div class="hero-section text-center">
         <h1>Proyecto de Métodos Numéricos</h1>
-        <p>Estudio detallado de la Serie de Taylor y Maclaurin</p>
+        <p>Muestra el paso a paso de varios metodos numericos</p>
     </div>
 
     <div class="container">
@@ -45,6 +45,10 @@
                         <div class="mb-3">
                             <label class="form-label">Función f(x)</label>
                             <input type="text" name="funcion" class="form-control" placeholder="sin(x) + x^2" required>
+                            <small class="text-muted">
+                                Funciones válidas:
+                                sin(x), cos(x), exp(x), log(x)
+                            </small>
                             <small class="text-muted">Usa ^ para potencias</small>
                         </div>
                         <div class="mb-3">
@@ -52,8 +56,17 @@
                             <input type="number" name="punto_a" class="form-control" value="0">
                             <small class="text-muted">Si es 0, se aplica Maclaurin</small>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Número de términos
+                            </label>
+                            <input type="number" name="n_terminos" class="form-control" value="5" min="1" max="5">
+                        </div>
                         <button type="submit" class="btn btn-primary w-100">Calcular Paso a Paso</button>
                     </form>
+                    <div class="text-center text-muted mt-5">
+                        <p>Ingresa una función para ver el desarrollo.</p>
+                    </div>
                 </div>
             </div>
 
@@ -88,10 +101,10 @@
                                 data-bs-parent="#accordionPasos">
                                 <div class="accordion-body">
                                     <p><strong>1. Derivada de orden {{ paso.n }}:</strong><br>
-                                        f({{ paso.n }})(x) = {{ paso.derivada }}</p>
+                                        \[ f^{({{ paso.n }})}(x) = {{ paso.derivada|safe }} \]</p>
 
                                     <p><strong>2. Evaluando en x = {{ punto_a|default:0 }}:</strong><br>
-                                        f({{ paso.n }})(a) = {{ paso.valor_derivada }} </p>
+                                        \[ f^{({{ paso.n }})}(a) = {{ paso.valor_derivada }} \] </p>
 
                                     <p><strong>3. Término generado:</strong><br>
                                         \[ {{ paso.termino_latex }} \]</p>
@@ -100,27 +113,27 @@
                             </div>
                         </div>
                         {% endfor %}
-                        {% if resultado.grafica %}
-                        <div class="card math-card p-4 mt-4">
-                            <h4 class="text-center mb-3">Gráfico de Aproximación</h4>
-                            <div style="width: 100%; overflow: hidden; border-radius: 10px;">
-                                {{ resultado.grafica|safe }}
-                            </div>
-                            <p class="small text-muted mt-2 text-center">
-                                La línea punteada muestra cómo la serie de Taylor se ajusta a la función original.
-                            </p>
-                        </div>
-                        {% endif %}
+
                     </div>
+
                 </div>
                 {% endif %}
 
                 {% else %}
-                <div class="text-center text-muted mt-5">
-                    <p>Ingresa una función a la izquierda para ver el desarrollo.</p>
-                </div>
+
                 {% endif %}
             </div>
+            {% if resultado.grafica %}
+            <div class="card math-card p-4 mt-4">
+                <h4 class="text-center mb-3">Gráfico de Aproximación</h4>
+                <div style="width: 100%; overflow: hidden; border-radius: 10px;">
+                    {{ resultado.grafica|safe }}
+                </div>
+                <p class="small text-muted mt-2 text-center">
+                    La línea punteada muestra cómo la serie de Taylor se ajusta a la función original.
+                </p>
+            </div>
+            {% endif %}
         </div>
     </div>
 

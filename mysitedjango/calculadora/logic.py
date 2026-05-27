@@ -9,7 +9,7 @@ def calcular_taylor_maclaurin(funcion_str, punto_a, n_terminos=5):
     """
     x = sp.symbols('x')
     try:
-        # Convertimos el texto (ej: "sin(x)") en una expresión matemática
+        # Convertimos el texto en una expresión matemática
         f_procesada = funcion_str.replace("^", "**")
         f = sp.sympify(f_procesada, locals={'x': sp.symbols('x')})
 
@@ -27,9 +27,9 @@ def calcular_taylor_maclaurin(funcion_str, punto_a, n_terminos=5):
 
             pasos.append({
                 'n': i,
-                'derivada': str(derivada),
-                'valor_derivada': str(valor_en_a),
-                'termino_latex': sp.latex(termino)
+                'derivada': sp.latex(derivada),
+                'valor_derivada': sp.latex(sp.simplify(valor_en_a)),
+                'termino_latex': sp.latex(sp.simplify(termino))
             })
 
         return {
@@ -37,6 +37,7 @@ def calcular_taylor_maclaurin(funcion_str, punto_a, n_terminos=5):
             'resultado_final_raw': serie,  # <-- AGREGAMOS ESTO PARA LA GRÁFICA
             'pasos': pasos,
             'error': None
+
         }
     except Exception as e:
         return {'error': str(e)}
