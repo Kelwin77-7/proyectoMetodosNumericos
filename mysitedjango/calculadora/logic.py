@@ -3,86 +3,128 @@ import plotly.graph_objects as go
 import numpy as np
 
 
+
 def calcular_taylor_maclaurin(funcion_str, punto_a, n_terminos=5):
-    """
-    Calcula la serie de Taylor. Si punto_a = 0, es Maclaurin.
-    """
     x = sp.symbols('x')
+
     try:
-        # Convertimos el texto en una expresión matemática
         f_procesada = funcion_str.replace("^", "**")
-        f = sp.sympify(f_procesada, locals={'x': sp.symbols('x')})
+        f = sp.sympify(f_procesada)
 
         serie = 0
         pasos = []
 
         for i in range(n_terminos):
-            # 1. Derivada i-ésima
             derivada = sp.diff(f, x, i)
-            # 2. Evaluar en el punto a
             valor_en_a = derivada.subs(x, punto_a)
-            # 3. Construir el término
+
             termino = (valor_en_a / sp.factorial(i)) * (x - punto_a)**i
             serie += termino
 
             pasos.append({
-                'n': i,
-                'derivada': sp.latex(derivada),
-                'valor_derivada': sp.latex(sp.simplify(valor_en_a)),
-                'termino_latex': sp.latex(sp.simplify(termino))
+                "n": i,
+                "derivada": sp.latex(derivada),
+                "valor_derivada": sp.latex(sp.simplify(valor_en_a)),
+                "termino_latex": sp.latex(sp.simplify(termino))
             })
 
         return {
-            'resultado_final': sp.latex(serie),
-            'resultado_final_raw': serie,  # <-- AGREGAMOS ESTO PARA LA GRÁFICA
-            'pasos': pasos,
-            'error': None
-
+            "resultado_final": sp.latex(serie),
+            "resultado_final_raw": serie,
+            "pasos": pasos,
+            "error": None
         }
+
     except Exception as e:
-        return {'error': str(e)}
+        return {"error": str(e)}
 
 
 def generar_grafica(funcion_str, punto_a, serie_sympy):
-    x_sym = sp.symbols('x')
-    try:
-        # Convertimos las funciones de SymPy a funciones que NumPy entienda
-        f_num = sp.lambdify(x_sym, sp.sympify(
-            funcion_str.replace("^", "**")), "numpy")
-        p_num = sp.lambdify(x_sym, serie_sympy, "numpy")
+    x = sp.symbols('x')
 
-        # Rango de la gráfica (5 unidades a la izquierda y derecha del punto a)
+    try:
+        f_num = sp.lambdify(x, sp.sympify(funcion_str.replace("^", "**")), "numpy")
+        p_num = sp.lambdify(x, serie_sympy, "numpy")
+
         x_vals = np.linspace(float(punto_a) - 5, float(punto_a) + 5, 400)
 
-        y_original = f_num(x_vals)
-        y_taylor = p_num(x_vals)
+        y1 = f_num(x_vals)
+        y2 = p_num(x_vals)
 
-        # Si f_num devuelve un solo número (función constante), lo convertimos en array
-        if isinstance(y_original, (int, float, complex)):
-            y_original = np.full_like(x_vals, y_original)
-        if isinstance(y_taylor, (int, float, complex)):
-            y_taylor = np.full_like(x_vals, y_taylor)
+        if isinstance(y1, (int, float)):
+            y1 = np.full_like(x_vals, y1)
+        if isinstance(y2, (int, float)):
+            y2 = np.full_like(x_vals, y2)
 
         fig = go.Figure()
-        # Línea de la función original
-        fig.add_trace(go.Scatter(x=x_vals, y=y_original,
-                      name="f(x) Original", line=dict(color='#007bff')))
-        # Línea de la aproximación de Taylor
-        fig.add_trace(go.Scatter(x=x_vals, y=y_taylor, name="Aprox. Taylor", line=dict(
-            color='#ff7f0e', dash='dash')))
+
+        fig.add_trace(go.Scatter(
+            x=x_vals, y=y1,
+            name="f(x)",
+            line=dict(color="#007bff")
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=x_vals, y=y2,
+            name="Taylor",
+            line=dict(color="#ff7f0e", dash="dash")
+        ))
 
         fig.update_layout(
-            title="Visualización: Función vs Aproximación",
-            xaxis_title="x",
-            yaxis_title="y",
+            title="Función vs Aproximación",
             template="plotly_white",
-            autosize=True,  # <-- Esto es clave
-            # Ajustamos márgenes para que no se corte
-            margin=dict(l=40, r=20, t=40, b=40),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02,
-                        xanchor="right", x=1)  # Leyenda arriba
+            margin=dict(l=40, r=20, t=40, b=40)
         )
 
         return fig.to_html(full_html=False)
+
     except:
-        return "<p class='text-danger'>No se pudo generar la gráfica para esta función.</p>"
+        return "<p>Error al generar gráfica</p>"
+
+
+def biseccion(funcion_str, a, b, tolerancia=1e-6, max_iter=100):
+    x = sp.symbols('x')
+
+    try:
+        f = sp.sympify(funcion_str.replace("^", "**"))
+
+        def fx(val):
+            return float(f.subs(x, val))
+
+        if fx(a) * fx(b) >= 0:
+            return {
+                "error": "La función no cambia de signo en el intervalo."
+            }
+
+        iteraciones = []
+
+        c = 0
+
+        for i in range(max_iter):
+            c = (a + b) / 2
+            fc = fx(c)
+
+            iteraciones.append({
+                "iter": i + 1,
+                "a": a,
+                "b": b,
+                "c": c,
+                "f_c": fc
+            })
+
+            if abs(fc) < tolerancia:
+                break
+
+            if fx(a) * fc < 0:
+                b = c
+            else:
+                a = c
+
+        return {
+            "raiz_aproximada": c,
+            "iteraciones": iteraciones,
+            "error": None
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
