@@ -32,7 +32,7 @@
 
     <div class="hero-section text-center">
         <h1>Proyecto de Métodos Numéricos</h1>
-        <p>Serie de Taylor, Maclaurin y Bisección</p>
+        <p>Serie de Taylor Maclaurin, Bisección y Secante</p>
     </div>
 
     <div class="container">
@@ -58,6 +58,11 @@
                                 <option value="biseccion"
                                     {% if request.POST.metodo == "biseccion" %}selected{% endif %}>
                                     Bisección
+                                </option>
+
+                                <option value="secante"
+                                    {% if request.POST.metodo == "secante" %}selected{% endif %}>
+                                    Secante
                                 </option>
                             </select>
                         </div>
@@ -100,13 +105,29 @@
                             <input type="number" name="b" class="form-control"
                                 value="{{ request.POST.b }}">
                         </div>
+                        
+                        <!-- INTERVALO C -->
+                        <hr>
 
-                        <button type="submit" class="btn btn-primary w-100">
-                            Calcular
-                        </button>
-                    </form>
-                </div>
-            </div>
+                        <div class="mb-3">
+                            <label class="form-label">x0 (Secante)</label>
+                            <input type="number" step="any" name="x0" class="form-control"
+                                value="{{ request.POST.x0 }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">x1 (Secante)</label>
+                            <input type="number" step="any" name="x1" class="form-control"
+                                value="{{ request.POST.x1 }}">
+                        </div>
+
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        Calcular
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
 
             <!-- RESULTADOS -->
             <div class="col-md-7">
@@ -155,7 +176,7 @@
                 {% endif %}
 
                 <!-- BISECCIÓN -->
-                {% if resultado.raiz_aproximada %}
+                {% if resultado.raiz_aproximada and request.POST.metodo == "biseccion" %}
                 <div class="card math-card p-4 mb-4">
                     <h4 class="text-success">Método de Bisección</h4>
 
@@ -189,6 +210,106 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+                {% endif %}
+
+                 <!-- SECANTE -->
+                {% if request.POST.metodo == "secante" %}
+                <div class="card math-card p-4 mb-4">
+                        <h4 class="text-warning">Definición y Fundamento Teórico</h4>
+
+                        <p>
+                            El método de la secante es un método numérico utilizado para encontrar
+                            raíces de ecuaciones no lineales. A diferencia del método de Newton-Raphson,
+                            no requiere calcular derivadas.
+                        </p>
+
+                        <p>
+                            Utiliza dos aproximaciones iniciales y genera una nueva aproximación
+                            mediante la recta secante que pasa por los puntos
+                            (x₀, f(x₀)) y (x₁, f(x₁)).
+                        </p>
+
+                        <div class="alert alert-light">
+                            Fórmula:
+                            <br><br>
+                            \[
+                            x_{n+1}=x_n-\frac{f(x_n)(x_n-x_{n-1})}
+                            {f(x_n)-f(x_{n-1})}
+                            \]
+                        </div>
+                    </div>
+                    
+                    {% if resultado.grafica %}
+                    <div class="card math-card p-4 mb-4">
+                            <h4 class="text-warning">Representación Gráfica</h4>
+
+                            {{ resultado.grafica|safe }}
+                    </div>
+                    {% endif %}
+
+                    <div class="card math-card p-4 mb-4">
+                    <h4 class="text-warning">Método de la Secante</h4>
+
+                    {% if resultado.error %}
+                    <div class="alert alert-danger">
+                    {{ resultado.error }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                    Raíz aproximada:
+                    <strong>{{ resultado.raiz_aproximada }}</strong>
+                    </div>
+
+                    <h5>Iteraciones</h5>
+                    <h5>Procedimiento Paso a Paso</h5>
+
+                    <div class="accordion mb-3">
+                        {% for it in resultado.iteraciones %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#sec{{ it.iter }}">
+                                    Iteración {{ it.iter }}
+                                </button>
+                            </h2>
+
+                            <div id="sec{{ it.iter }}" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                    <p><strong>x₀:</strong> {{ it.x0 }}</p>
+                                    <p><strong>x₁:</strong> {{ it.x1 }}</p>
+                                    <p><strong>x₂:</strong> {{ it.x2 }}</p>
+                                    <p><strong>f(x₂):</strong> {{ it.f_x2 }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                        <th>Iter</th>
+                        <th>x0</th>
+                        <th>x1</th>
+                        <th>x2</th>
+                        <th>f(x2)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for it in resultado.iteraciones %}
+                        <tr>
+                        <td>{{ it.iter }}</td>
+                        <td>{{ it.x0 }}</td>
+                        <td>{{ it.x1 }}</td>
+                        <td>{{ it.x2 }}</td>
+                        <td>{{ it.f_x2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    </table>
+                {% endif %}
                 </div>
                 {% endif %}
 

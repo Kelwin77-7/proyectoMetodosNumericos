@@ -2,7 +2,9 @@ from django.shortcuts import render
 from .logic import (
     calcular_taylor_maclaurin,
     generar_grafica,
-    biseccion
+    generar_grafica_secante,
+    biseccion,
+    secante
 )
 import sympy as sp
 from datetime import datetime
@@ -70,6 +72,34 @@ def home(request):
                     "funcion": funcion,
                     "resultado": resultado_biseccion.get("raiz_aproximada"),
                     "intervalo": f"[{a}, {b}]",
+                    "fecha": datetime.now().strftime("%Y-%m-%d %H:%M")
+                })
+
+            except Exception as e:
+                resultado["error"] = str(e)
+        
+        elif funcion and metodo == "secante":
+
+            x0 = request.POST.get("x0")
+            x1 = request.POST.get("x1")
+
+            try:
+                x0 = float(x0)
+                x1 = float(x1)
+
+                resultado_secante = secante(funcion, x0, x1)
+
+                resultado_secante["grafica"] = generar_grafica_secante(
+                    funcion,
+                    x0,
+                    x1
+                )
+
+                resultado.update(resultado_secante)
+                historial.append({
+                    "metodo": "Secante",
+                    "funcion": funcion,
+                    "resultado": resultado_secante.get("raiz_aproximada"),
                     "fecha": datetime.now().strftime("%Y-%m-%d %H:%M")
                 })
 
