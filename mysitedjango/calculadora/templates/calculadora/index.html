@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Ingeniería</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <script>
         window.MathJax = {
             tex: {
@@ -19,9 +20,20 @@
     <style>
         body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
         .math-card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: white; margin-bottom: 20px; }
-        .hero-section { background: #1a73e8; color: white; padding: 40px 0; border-radius: 0 0 30px 30px; margin-bottom: 30px; }
+        .hero-section { background: #921ae8; color: white; padding: 40px 0; border-radius: 0 0 30px 30px; margin-bottom: 30px; }
         .campo-metodo { display: none; }
-        .teoria-box { background: #f8fbff; border-left: 4px solid #1a73e8; padding: 15px; border-radius: 5px; }
+        .teoria-box { background: #f8fbff; border-left: 4px solid #aa1ae8; padding: 15px; border-radius: 5px; }
+        .step-item { font-size: 0.9rem; border-left: 2px solid #dee2e6; padding-left: 15px; margin-left: 10px; }
+        .btn-calcular-custom {
+            background-color: #6f42c1; /* Aquí pones el código hexadecimal que quieras */
+            border-color: #6f42c1;
+            color: white;
+        }
+
+        .btn-calcular-custom:hover {
+            background-color: #59359a; /* Un tono más oscuro para cuando pases el mouse */
+            color: white;
+        }
     </style>
     <script>
         function actualizarFormulario() {
@@ -38,18 +50,20 @@
 <body>
     <div class="hero-section text-center shadow">
         <h1>Proyecto: Métodos Numéricos</h1>
-        <p class="opacity-75">Visualización y Resolución Paso a Paso</p>
+        <p class="opacity-75">Kelwin Rafael Racanac Chicol - carnet: 1990-24-20681</p>
+        <p class="opacity-75">Zury Waleska Alacan Jiatz    - carnet: 1990-24-9717</p>
+        <p class="opacity-75">Jose Javier Cana Arana       - carnet: 1990-24-9520</p>
     </div>
 
     <div class="container">
         <div class="row">
             <div class="col-lg-4">
                 <div class="card math-card p-4">
-                    <h5 class="mb-3 fw-bold">Parámetros</h5>
+                    <h5 class="mb-3 fw-bold"><i class="bi bi-sliders"></i> Parámetros</h5>
                     <form method="POST">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label class="form-label small">Método</label>
+                            <label class="form-label small fw-bold">Seleccionar Método</label>
                             <select name="metodo" class="form-select">
                                 <option value="taylor" {% if request.POST.metodo == "taylor" %}selected{% endif %}>Taylor / Maclaurin</option>
                                 <option value="biseccion" {% if request.POST.metodo == "biseccion" %}selected{% endif %}>Bisección</option>
@@ -82,65 +96,150 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 mt-2 fw-bold">CALCULAR</button>
+                        <button type="submit" class="btn btn-calcular-custom w-100 mt-2 fw-bold shadow-sm">
+                            Calcular
+                        </button>
                     </form>
-                </div>
-            </div>
-
-            <div class="col-lg-8">
-                {% if resultado %}
-                    {% if resultado.error %}
-                        <div class="alert alert-danger">{{ resultado.error }}</div>
-                    {% else %}
-                        <div class="card math-card p-4">
-                            <div class="teoria-box mb-4">
-                                <h6 class="text-primary fw-bold">Fundamento del Método</h6>
-                                <p class="mb-2">{{ resultado.descripcion }}</p>
-                                <div class="text-center p-2 bg-white rounded border my-2">
-                                    \[ {{ resultado.formula }} \]
+                </div>          
+            </div><div class="col-lg-8">
+                    {% if resultado %}
+                        {% if resultado.error %}
+                            <div class="alert alert-danger">{{ resultado.error }}</div>
+                        {% else %}
+                    
+                        {% if request.POST.metodo == "taylor" %}
+                        <div class="card math-card mb-4 border-start border-4 border-info">
+                            <div class="card-body">
+                                <h5 class="fw-bold"><i class="bi bi-book"></i> ¿Cómo se resuelve manualmente?</h5>
+                                <p class="text-muted small">Para construir un polinomio de Taylor seguimos estos 4 pasos esenciales:</p>
+                                
+                                <div class="step-item mb-3">
+                                    <strong>1. Definir el punto $a$:</strong> Es el valor central donde la aproximación es exacta. Si $a=0$, se llama Serie de Maclaurin.
                                 </div>
-                                <hr>
-                                <p class="mb-0 small text-muted"><strong>Aplicación:</strong> {{ resultado.ejemplo_datos }}</p>
+                                
+                                <div class="step-item mb-3">
+                                    <strong>2. Calcular Derivadas:</strong> Necesitamos obtener la 1ra, 2da, 3ra... hasta la $n$-ésima derivada de la función original $f(x)$.
+                                </div>
+                                
+                                <div class="step-item mb-3">
+                                    <strong>3. Evaluar en $a$:</strong> Sustituimos $x$ por el valor de $a$ en cada una de las derivadas obtenidas. Esto nos da los coeficientes.
+                                </div>
+                                
+                                <div class="step-item">
+                                    <strong>4. Armar el término:</strong> Cada pieza del polinomio se forma con la estructura: 
+                                    <span class="badge bg-light text-dark border">$\frac{f^{(n)}(a)}{n!}(x-a)^n$</span>
+                                </div>
+                        </div>
+                        {% endif %}
+
+                        {% if request.POST.metodo == "biseccion" %}
+                        <div class="card math-card mb-4 border-start border-4 border-success">
+                            <div class="card-body">
+                                <h5 class="fw-bold text-success"><i class="bi bi-intersect"></i> ¿Cómo funciona la Bisección?</h5>
+                                <p class="text-muted small">Es un método de "fuerza bruta" inteligente que se basa en el Teorema de Bolzano:</p>
+                                
+                                <div class="step-item mb-2 small">
+                                    <strong>1. El Intervalo $[a, b]$:</strong> La función debe cambiar de signo entre $a$ y $b$. Es decir, $f(a) \cdot f(b) < 0$.
+                                </div>
+                                
+                                <div class="step-item mb-2 small">
+                                    <strong>2. Punto Medio ($c$):</strong> Calculamos el centro del intervalo: $c = \frac{a+b}{2}$.
+                                </div>
+                                <div class="step-item mb-2 small">
+                                    <strong>3. Descarte:</strong> Evaluamos $f(c)$. Si $f(a)$ y $f(c)$ tienen signos opuestos, la raíz está en la mitad izquierda. Si no, está en la derecha.
+                                </div>
+                                <div class="step-item small text-primary fw-bold">
+                                    ¡Repetimos hasta que el intervalo sea tan pequeño que hayamos encontrado la raíz!
+                                </div>
                             </div>
+                        </div>
+                        {% endif %}
 
-                            {% if resultado.grafica %}
-                                <div class="mb-4 border rounded shadow-sm overflow-hidden">{{ resultado.grafica|safe }}</div>
-                            {% endif %}
-
-                            {% if resultado.resultado_final %}
-                                <h6 class="fw-bold">Polinomio Resultante:</h6>
-                                <div class="p-3 bg-light rounded text-center mb-4 border overflow-auto">
-                                    \[ P(x) = {{ resultado.resultado_final|safe }} \]
+                        {% if request.POST.metodo == "secante" %}
+                        <div class="card math-card mb-4 border-start border-4 border-warning">
+                            <div class="card-body">
+                                <h5 class="fw-bold text-warning"><i class="bi bi-graph-up"></i> El Concepto de la Secante</h5>
+                                <p class="text-muted small">A diferencia de la bisección, este método no necesita que la raíz esté "encerrada". Usa la pendiente entre dos puntos para disparar hacia la raíz.</p>
+                                
+                                <div class="step-item mb-2 small">
+                                    <strong>1. Puntos Iniciales:</strong> Necesitas dos valores cercanos, $x_0$ y $x_1$. No importa si tienen el mismo signo.
                                 </div>
+                                
+                                <div class="step-item mb-2 small">
+                                    <strong>2. La Proyección:</strong> Se traza una línea recta (secante) que pase por $(x_0, f(x_0))$ y $(x_1, f(x_1))$.
+                                </div>
+                                <div class="step-item mb-2 small">
+                                    <strong>3. Intersección ($x_2$):</strong> El punto donde esa línea toca el eje $x$ es nuestra nueva mejor aproximación.
+                                </div>
+                                <div class="text-center p-2 bg-light rounded border my-2 small">
+                                    Fórmula: $x_{n+1} = x_n - \frac{f(x_n)(x_n - x_{n-1})}{f(x_n) - f(x_{n-1})}$
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                        {% else %}
+                            <div class="card math-card p-5 text-center text-muted border-dashed">
+                                <i class="bi bi-calculator mb-3 d-block fs-1"></i>
+                                <i class="opacity-50">Ingresa los valores a la izquierda para generar el análisis matemático.</i>
+                            </div>
                             {% endif %}
-
-                            {% if resultado.pasos %}
-                                <div class="mt-5">
-                                    <h6 class="fw-bold"><i class="bi bi-list-check"></i> Desarrollo del Polinomio (Paso a Paso):</h6>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered align-middle">
-                                            <thead class="table-dark text-center">
-                                                <tr>
-                                                    <th style="width: 10%;">n</th>
-                                                    <th style="width: 30%;">Derivada \( f^{(n)}(x) \)</th>
-                                                    <th style="width: 25%;">Evaluada \( f^{(n)}(a) \)</th>
-                                                    <th style="width: 35%;">Término \( \frac{f^{(n)}(a)}{n!}(x-a)^n \)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for paso in resultado.pasos %}
-                                                <tr>
-                                                    <td class="text-center fw-bold">{{ paso.n }}</td>
-                                                    <td class="text-center">\[ {{ paso.derivada }} \]</td>
-                                                    <td class="text-center">\( {{ paso.valor_derivada }} \)</td>
-                                                    <td class="bg-light">\[ {{ paso.termino_latex }} \]</td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
+                        </div>
+                    </div>
+                    <div>
+                        {% if resultado %}
+                            {% if resultado.error %}
+                                <div class="alert alert-danger">{{ resultado.error }}</div>
+                            {% else %}
+                                <div class="card math-card p-4">
+                                    <div class="teoria-box mb-4">
+                                        <h6 class="text-primary fw-bold">Fundamento del Método</h6>
+                                        <p class="mb-2">{{ resultado.descripcion }}</p>
+                                        <div class="text-center p-2 bg-white rounded border my-2">
+                                            \[ {{ resultado.formula }} \]
+                                        </div>
+                                        <hr>
+                                        <p class="mb-0 small text-muted"><strong>Aplicación:</strong> {{ resultado.ejemplo_datos }}</p>
                                     </div>
-                                </div>
-                            {% endif %}
+
+                                    {% if resultado.grafica %}
+                                        <div class="mb-4 border rounded shadow-sm overflow-hidden">{{ resultado.grafica|safe }}</div>
+                                    {% endif %}
+
+                                    {% if resultado.resultado_final %}
+                                        <h6 class="fw-bold">Polinomio Resultante:</h6>
+                                        <div class="p-3 bg-light rounded text-center mb-4 border overflow-auto">
+                                            \[ P(x) = {{ resultado.resultado_final|safe }} \]
+                                        </div>
+                                    {% endif %}
+
+                                {% if resultado.pasos %}
+                                    <div class="mt-5">
+                                        <h6 class="fw-bold"><i class="bi bi-list-check"></i> Desarrollo del Polinomio (Paso a Paso):</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <thead class="table-dark text-center">
+                                                    <tr>
+                                                        <th style="width: 10%;">n</th>
+                                                        <th style="width: 30%;">Derivada \( f^{(n)}(x) \)</th>
+                                                        <th style="width: 25%;">Evaluada \( f^{(n)}(a) \)</th>
+                                                        <th style="width: 35%;">Término \( \frac{f^{(n)}(a)}{n!}(x-a)^n \)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for paso in resultado.pasos %}
+                                                    <tr>
+                                                        <td class="text-center fw-bold">{{ paso.n }}</td>
+                                                        <td class="text-center">\[ {{ paso.derivada }} \]</td>
+                                                        <td class="text-center">\( {{ paso.valor_derivada }} \)</td>
+                                                        <td class="bg-light">\[ {{ paso.termino_latex }} \]</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                {% endif %}
 
                             {% if resultado.iteraciones %}
                                 <h6 class="fw-bold">Tabla de Convergencia:</h6>
@@ -176,7 +275,7 @@
                                     Resultado Final: <strong>{{ resultado.raiz_aproximada }}</strong>
                                 </div>
                             {% endif %}
-                        </div>
+                    </div>
                     {% endif %}
                 {% else %}
                     <div class="card math-card p-5 text-center text-muted border-dashed">

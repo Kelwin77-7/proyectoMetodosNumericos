@@ -17,10 +17,27 @@ def calcular_taylor_maclaurin(funcion_str, punto_a, n_terminos=5):
             termino = (valor_en_a / sp.factorial(i)) * (x - punto_a)**i
             serie += termino
 
+            for i in range(n_terminos):
+                derivada = sp.diff(f, x, i)
+                valor_en_a = derivada.subs(x, punto_a)
+                denominador = sp.factorial(i)
+                termino = (valor_en_a / denominador) * (x - punto_a)**i
+                serie += termino
+
+                # Texto explicativo personalizado por paso
+                if i == 0:
+                    explicacion = f"Calculamos el valor inicial de la función en $x={punto_a}$."
+                elif i == 1:
+                    explicacion = f"Obtenemos la primera derivada y evaluamos la pendiente en el punto."
+                else:
+                    explicacion = f"Calculamos la derivada de orden {i} para ajustar la curvatura."
+
             pasos.append({
                 "n": i,
                 "derivada": sp.latex(derivada),
                 "valor_derivada": sp.latex(sp.simplify(valor_en_a)),
+                "denominador": sp.factorial(i),
+                "potencia": sp.latex(sp.simplify((x - punto_a)**i)),
                 "termino_latex": sp.latex(sp.simplify(termino))
             })
 
@@ -52,7 +69,6 @@ def biseccion(funcion_str, a, b, tolerancia=1e-6, max_iter=100):
             c = (a + b) / 2
             fc = float(f(c))
 
-            # Guardamos todos los datos para el paso a paso
             iteraciones.append({
                 "iter": i + 1,
                 "a": a,
